@@ -1,0 +1,229 @@
+CREATE DATABASE BiteIn;
+
+CREATE TABLE BiteIn.Insurance(
+InsuranceID varchar(20) PRIMARY KEY,
+InsuranceName varchar(20),
+FromDate date,
+ToDate date
+);
+
+CREATE TABLE BiteIn.Patient
+(PatientID varchar(20) PRIMARY KEY,
+InsuranceID varchar(20),
+FirstName varchar(40),
+LastName varchar(40),
+Gender varchar(10),
+DOB date,
+Address varchar(100),
+ZipCode varchar(20),
+Contactno varchar(20),
+CONSTRAINT FK_InsuraID FOREIGN KEY (InsuranceID)
+    REFERENCES Insurance(InsuranceID) 
+);
+
+
+CREATE TABLE BiteIn.Dentist
+(DentistID varchar(20) PRIMARY KEY,
+FirstName VARCHAR(40),
+DentistName VARCHAR(40),
+Gender VARCHAR(10),
+DOB DATE,
+Workex int,
+Contactno VARCHAR(20)
+);
+
+CREATE TABLE BiteIn.Manufacturer(
+ManufacturerID varchar(20) PRIMARY KEY,
+ManufacturerName varchar(20));
+
+CREATE TABLE BiteIn.Prescription
+(PrescID varchar(20) PRIMARY KEY,
+VisitDate date,
+PatientID varchar(20),
+InsuranceID varchar(20),
+SymptomID varchar(20),
+Medication varchar(40),
+MedicationQty int,
+ManufacturerName varchar(20),
+CONSTRAINT FK_InsuraceeID FOREIGN KEY (InsuranceID)
+    REFERENCES Insurance(InsuranceID)
+);
+
+CREATE TABLE BiteIn.Pharmacy
+(PharmID varchar(20) PRIMARY KEY,
+PharmAddress varchar(40),
+PharmZipcode int,
+PrescID varchar(20),
+PatientID varchar(20),
+DentistID varchar(20),
+Medication varchar(40),
+MedicationQty int,
+ManufacturerID varchar(20),
+CONSTRAINT FK_ManufactttID FOREIGN KEY (ManufacturerID)
+    REFERENCES Manufacturer(ManufacturerID),
+CONSTRAINT FK_patientttID FOREIGN KEY (PatientID)
+    REFERENCES patient(PatientID),
+CONSTRAINT FK_dentistttID FOREIGN KEY (DentistID)
+    REFERENCES dentist(DentistID),   
+CONSTRAINT FK_PrescriptionnnID FOREIGN KEY (PrescID)
+    REFERENCES Prescription(PrescID)
+);
+
+
+CREATE TABLE BiteIn.Supplies
+(ManufacturerID varchar(20),
+PharmID varchar(20),
+SupplyAmt int,
+CONSTRAINT FK_ManuuffID FOREIGN KEY (ManufacturerID)
+references Manufacturer(ManufacturerID),
+CONSTRAINT FK_PharmmID FOREIGN KEY (PharmID)
+references Pharmacy(PharmID)
+);
+
+CREATE TABLE BiteIn.Symptom(
+SymptomID varchar(20) PRIMARY KEY,
+SymptomName varchar(40));
+
+CREATE TABLE BiteIn.VisitingDetails
+(
+VisitID varchar(20) PRIMARY KEY,
+Vdate datetime,
+DentistID varchar(20),
+PatientID varchar(20),
+PatientIssue varchar(40),
+SymptomID varchar(20),
+PrescID varchar(20),
+CONSTRAINT FK_patiID FOREIGN KEY (patientID)
+    REFERENCES patient(patientID),
+CONSTRAINT FK_dentID FOREIGN KEY (dentistID)
+    REFERENCES dentist(dentistID),   
+CONSTRAINT FK_SymptomID FOREIGN KEY (SymptomID)
+    REFERENCES Symptom(SymptomID),
+CONSTRAINT FK_PrescID FOREIGN KEY (PrescID)
+    REFERENCES Prescription(PrescID)
+);
+
+CREATE TABLE BiteIn.Receptionist
+(
+RID varchar(20) PRIMARY KEY,
+FirstName varchar(40),
+LastName varchar(40),
+Gender VARCHAR(10),
+Workex int,
+Contactno varchar(20)
+);
+
+CREATE TABLE BiteIn.AppointmentDetails
+(
+AppID varchar(20) PRIMARY KEY,
+patientID varchar(20),
+DentistID varchar(20),
+Appdate DATETIME,
+RID varchar(20),
+CONSTRAINT FK_sxpattID FOREIGN KEY (patientID)
+    REFERENCES patient(patientID),
+CONSTRAINT FK_sxdenttID FOREIGN KEY (dentistID)
+    REFERENCES dentist(dentistID),
+CONSTRAINT FK_xRID FOREIGN KEY (RID)
+    REFERENCES Receptionist(RID)
+);
+
+CREATE TABLE BiteIn.BillingInfo
+(
+ReceiptID varchar(20) PRIMARY KEY,
+AppID varchar(20),
+patientID varchar(20),
+InsuranceID varchar(20),
+DentistID varchar(20),
+AppDate Datetime,
+BillingAmt decimal,
+CONSTRAINT FK_xpattID FOREIGN KEY (patientID)
+    REFERENCES patient(patientID),
+CONSTRAINT FK_xdenttID FOREIGN KEY (dentistID)
+    REFERENCES dentist(dentistID),   
+CONSTRAINT FK_xApppID FOREIGN KEY (AppID)
+    REFERENCES AppointmentDetails(AppID),   
+CONSTRAINT FK_xInsurrID FOREIGN KEY (InsuranceID)
+    REFERENCES Insurance(InsuranceID)   
+);
+
+CREATE TABLE biteIn.MedHistory
+(
+MedHis varchar(20) PRIMARY KEY,
+patientID varchar(20),
+Age int,
+Gender varchar(10),
+Weight decimal,
+Height decimal,
+BMI decimal,
+BP int,
+CONSTRAINT FK_xxppatID FOREIGN KEY (patientID)
+    REFERENCES patient(patientID)
+);
+
+CREATE TABLE BiteIn.Medicine(
+MedicineID varchar(20) PRIMARY KEY,
+MedicineName varchar(20),
+ManufacturerID varchar(20),
+CONSTRAINT FK_ManuID FOREIGN KEY (ManufacturerID)
+REFERENCES Manufacturer(ManufacturerID)
+);
+
+
+
+CREATE TABLE BiteIn.Payment(
+PaymnetID varchar(20) PRIMARY KEY,
+PatientID varchar(20),
+DentistID varchar(20),
+PayMode varchar(20),
+Paydate date,
+PayAmt decimal,
+Balance decimal,
+CONSTRAINT FK_patieID FOREIGN KEY (patientID)
+    REFERENCES patient(patientID),
+CONSTRAINT FK_deentisID FOREIGN KEY (dentistID)
+    REFERENCES dentist(dentistID)
+)
+
+-----------------------------------------------------------------
+--DATA Insertion---
+-----------------------------------------------------------------
+
+LOAD DATA LOCAL INFILE 'C:\\prescription.txt' 
+INTO TABLE BiteIn.Prescription FIELDS 
+TERMINATED BY '\t' LINES TERMINATED BY '\n'
+IGNORE 1 LINES(PrescID, VisitDate, PatientID, SymptomID, MedicineID, MedicineQty, MedicineName, DentistID
+);
+
+LOAD DATA LOCAL INFILE 'C:\\dentist.txt' 
+INTO TABLE BiteIn.dentist FIELDS 
+TERMINATED BY '\t' LINES TERMINATED BY '\n'
+IGNORE 1 LINES(DentistID, FirstName, LastName, Gender, DOB, WorkEx, Contactno);
+
+LOAD DATA LOCAL INFILE 'C:\\Insurance.txt' 
+INTO TABLE BiteIn.insurance FIELDS 
+TERMINATED BY '\t' LINES TERMINATED BY '\n'
+IGNORE 1 LINES(InsuranceID,InsuranceName,FromDate,ToDate);
+
+LOAD DATA LOCAL INFILE 'C:\\Receptionist.txt' 
+INTO TABLE BiteIn.receptionist FIELDS 
+TERMINATED BY '\t' LINES TERMINATED BY '\n'
+IGNORE 1 LINES(RID,FirstName,Lastname,Gender,WorkEx,Contactno);
+
+LOAD DATA LOCAL INFILE 'C:\\AppointmentDetails.txt' 
+INTO TABLE BiteIn.appointmentdetails FIELDS 
+TERMINATED BY '\t' LINES TERMINATED BY '\n'
+IGNORE 1 LINES(AppID,PatientID,DentistID,AppDate,RID);
+
+LOAD DATA LOCAL INFILE 'C:\\MedHistory.txt' 
+INTO TABLE BiteIn.medhistory FIELDS 
+TERMINATED BY '\t' LINES TERMINATED BY '\n'
+IGNORE 1 LINES(HistoryID,PatientID,Age,Gender,Weight,Height,BMI,BP);
+
+LOAD DATA LOCAL INFILE 'C:\\BillingInfo.txt' 
+INTO TABLE BiteIn.billinginfo FIELDS 
+TERMINATED BY '\t' LINES TERMINATED BY '\n'
+IGNORE 1 LINES(ReceiptID,AppID,PatientID,AppDate,BillingAmt,RID);
+
+
+
